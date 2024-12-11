@@ -77,7 +77,7 @@ jobs:
       # Paso 8: Despliegue
       - name: Deploy
         run: |
-          ssh user@your-server.com 'cd /path/to/deployment && git pull && php setup.php'
+          ssh root@165.232.133.197 'cd /path/to/deployment && git pull && php setup.php'
 
       # Paso 9: Notificar éxito (opcional)
       - name: Notify success
