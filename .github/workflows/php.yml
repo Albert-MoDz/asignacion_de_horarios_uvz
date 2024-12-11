@@ -46,6 +46,11 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
+      # Agregar el host remoto al archivo known_hosts
+      - name: Add DigitalOcean server to known_hosts
+        run: |
+          ssh-keyscan -H 165.232.133.197 >> ~/.ssh/known_hosts
+
       # Paso 3: Configurar PHP
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -72,25 +77,12 @@ jobs:
           name: build-artifacts
           path: artifacts/build.zip
 
-      # Paso 7: Instalar doctl (DigitalOcean CLI)
-      - name: Install doctl
-        run: |
-          curl -sL https://github.com/digitalocean/doctl/releases/download/v1.96.0/doctl-1.96.0-linux-amd64.tar.gz | tar -xz
-          sudo mv doctl /usr/local/bin/
-
-      # Paso 8: Autenticarse con DigitalOcean
-      - name: Authenticate with DigitalOcean
-        env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-        run: |
-          doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
-
-      # Paso 9: Despliegue a DigitalOcean
+      # Paso 7: Despliegue a DigitalOcean
       - name: Deploy to DigitalOcean
         run: |
           ssh root@165.232.133.197 'cd /path/to/deployment && git pull && php setup.php'
 
-      # Paso 10: Notificar éxito (opcional)
+      # Paso 8: Notificar éxito (opcional)
       - name: Notify success
         if: success()
         run: echo "Deployment completed successfully!"
