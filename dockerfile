@@ -1,8 +1,16 @@
 # Usa la imagen base de PHP con Apache
 FROM php:7.4-apache
 
-# Instalar extensiones necesarias para PHP
-RUN docker-php-ext-install mysqli intl mbstring
+# Instalar dependencias necesarias para compilar extensiones PHP
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install \
+    mysqli \
+    intl \
+    mbstring \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Configurar DocumentRoot en Apache (opcional)
 ENV APACHE_DOCUMENT_ROOT /var/www/html
