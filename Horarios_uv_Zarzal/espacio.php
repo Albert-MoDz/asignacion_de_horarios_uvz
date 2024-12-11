@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Update existing espacio
         $sql = "UPDATE espacio SET idTipoEsp = ?, codUbi = ?, capacidad = ?, piso = ?, cumpleInclusion = ? WHERE idEsp = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiiiii", $idTipoEsp, $codUbi, $capacidad, $piso, $cumpleInclusion, $idEsp);
+        $stmt->bind_param("iiisii", $idTipoEsp, $codUbi, $capacidad, $piso, $cumpleInclusion, $idEsp);
         if ($stmt->execute()) {
             echo "<script>alert('Espacio actualizado exitosamente.'); window.location.href = 'espacio.php';</script>";
         } else {
@@ -207,7 +207,7 @@ $result = $conn->query($sql);
                 <input type="number" name="idTipoEsp" id="idTipoEsp" placeholder="ID del Tipo de Espacio" required>
                 <input type="number" name="codUbi" id="codUbi" placeholder="Código de la Ubicación" required>
                 <input type="number" name="capacidad" id="capacidad" placeholder="Capacidad" required>
-                <input type="number" name="piso" id="piso" placeholder="Piso" required>
+                <input type="text" name="piso" id="piso" placeholder="Piso" required>
                 <input type="number" name="cumpleInclusion" id="cumpleInclusion" placeholder="Cumple con Inclusión" required>
                 <button type="submit">Guardar</button>
             </form>

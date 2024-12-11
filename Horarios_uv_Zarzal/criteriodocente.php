@@ -16,16 +16,17 @@ require_once "config/conexion.php";
 // Handle form submission for adding or updating a criterion of teacher
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $idCritDoc = $_POST['idCritDoc'];
-    $diasHorario = $_POST['diasHorario'];
+    $diaCritDoc = $_POST['diaCritDoc'];
     $idDoc = $_POST['idDoc'];
     $fechaRegistroCri = $_POST['fechaRegistroCri'];
     $codInclu = $_POST['codInclu'];
+    $hora = $_POST['hora'];
 
     if ($idCritDoc) {
         // Update existing criterion of teacher
-        $sql = "UPDATE criteriodocente SET diasHorario = ?, idDoc = ?, fechaRegistroCri = ?, codInclu = ? WHERE idCritDoc = ?";
+        $sql = "UPDATE criteriodocente SET diaCritDoc = ?, idDoc = ?, fechaRegistroCri = ?, codInclu = ?, hora = ? WHERE idCritDoc = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sisii", $diasHorario, $idDoc, $fechaRegistroCri, $codInclu, $idCritDoc);
+        $stmt->bind_param("sisiii", $diaCritDoc, $idDoc, $fechaRegistroCri, $codInclu, $idCritDoc, $hora);
         if ($stmt->execute()) {
             echo "<script>alert('Criterio de docente actualizado exitosamente.'); window.location.href = 'criteriodocente.php';</script>";
         } else {
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->close();
     } else {
         // Insert new criterion of teacher
-        $sql = "INSERT INTO criteriodocente (diasHorario, idDoc, fechaRegistroCri, codInclu) VALUES ('$diasHorario', '$idDoc', '$fechaRegistroCri', '$codInclu')";
+        $sql = "INSERT INTO criteriodocente (diaCritDoc, idDoc, fechaRegistroCri, codInclu, hora) VALUES ('$diaCritDoc', '$idDoc', '$fechaRegistroCri', '$codInclu', '$hora')";
         $resultado = mysqli_query($conn, $sql);
         if ($resultado === TRUE) {
             header("location: criteriodocente.php");
@@ -61,7 +62,7 @@ if (isset($_GET['delete'])) {
 
 // Handle search
 $search = $_GET['search'] ?? '';
-$searchQuery = $search ? "WHERE diasHorario LIKE '%$search%' OR idDoc LIKE '%$search%' OR fechaRegistroCri LIKE '%$search%' OR codInclu LIKE '%$search%'" : '';
+$searchQuery = $search ? "WHERE diaCritDoc LIKE '%$search%' OR idDoc LIKE '%$search%' OR fechaRegistroCri LIKE '%$search%' OR codInclu LIKE '%$search%'OR hora LIKE '%$search%'" : '';
 
 // Pagination settings
 $recordsPerPage = 10;
@@ -92,24 +93,7 @@ $result = $conn->query($sql);
             padding: 0;
             background-color: #f0f0f0;
         }
-        .navbar {
-            background-color: #DC143C;
-            overflow: hidden;
-        }
-        .navbar a {
-            float: left;
-            display: block;
-            color: #fff;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
-        }
-        .navbar a:hover {
-            background-color: #FF5A73;
-        }
-        .navbar .right {
-            float: right;
-        }
+        
         .content {
             padding: 20px;
             text-align: center;
@@ -189,24 +173,18 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="inicio.php">Home</a>
-        <a href="docente.php">Docente</a>
-        <a href="tipodocente.php">Tipo de Docente</a>
-        <a href="criteriodocente.php">Criterio de Docente</a>
-        <a href="inclusionsocial.php">Inclusión Social</a>
-        <a href="docasighorario.php">Docente Asignatura</a>
-        <a href="logout.php" class="right">cerrar sesion</a>
-    </div>
+<?php include 'menu.php'; ?>
     <div class="content">
         <h1>Criterio de Docente</h1>
         <div class="form-container">
             <form action="criteriodocente.php" method="post">
                 <input type="hidden" name="idCritDoc" id="idCritDoc">
-                <input type="text" name="diasHorario" id="diasHorario" placeholder="Días de Horario" required>
+                <input type="text" name="diaCritDoc" id="diaCritDoc" placeholder="Días Criterio Docente" required>
                 <input type="number" name="idDoc" id="idDoc" placeholder="ID del Docente" required>
                 <input type="date" name="fechaRegistroCri" id="fechaRegistroCri" placeholder="Fecha de Registro" required>
                 <input type="number" name="codInclu" id="codInclu" placeholder="Código de Inclusión" required>
+                <input type="number" name="hora" id="hora" placeholder="hora" required>
+                
                 <button type="submit">Guardar</button>
             </form>
         </div>
@@ -220,10 +198,11 @@ $result = $conn->query($sql);
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Días de Horario</th>
+                    <th>Días criterio Docente</th>
                     <th>ID Docente</th>
                     <th>Fecha de Registro</th>
                     <th>Código de Inclusión</th>
+                    <th>Hora</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -231,12 +210,13 @@ $result = $conn->query($sql);
                 <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
                     <td><?php echo $row['idCritDoc']; ?></td>
-                    <td><?php echo $row['diasHorario']; ?></td>
+                    <td><?php echo $row['diaCritDoc']; ?></td>
                     <td><?php echo $row['idDoc']; ?></td>
                     <td><?php echo $row['fechaRegistroCri']; ?></td>
                     <td><?php echo $row['codInclu']; ?></td>
+                    <td><?php echo $row['hora']; ?></td>
                     <td class="actions">
-                        <a href="javascript:void(0);" onclick="editCriterioDocente(<?php echo $row['idCritDoc']; ?>, '<?php echo $row['diasHorario']; ?>', '<?php echo $row['idDoc']; ?>', '<?php echo $row['fechaRegistroCri']; ?>', '<?php echo $row['codInclu']; ?>')">Editar</a>
+                        <a href="javascript:void(0);" onclick="editCriterioDocente(<?php echo $row['idCritDoc']; ?>, '<?php echo $row['diaCritDoc']; ?>', '<?php echo $row['idDoc']; ?>', '<?php echo $row['fechaRegistroCri']; ?>', '<?php echo $row['codInclu']; ?>', '<?php echo $row['hora']; ?>')">Editar</a>
                         <a href="criteriodocente.php?delete=<?php echo $row['idCritDoc']; ?>" onclick="return confirm('¿Estás seguro de eliminar este criterio de docente?')">Eliminar</a>
                     </td>
                 </tr>
@@ -256,12 +236,13 @@ $result = $conn->query($sql);
         </div>
     </div>
     <script>
-        function editCriterioDocente(idCritDoc, diasHorario, idDoc, fechaRegistroCri, codInclu) {
+        function editCriterioDocente(idCritDoc, diaCritDoc, idDoc, fechaRegistroCri, codInclu) {
             document.getElementById('idCritDoc').value = idCritDoc;
-            document.getElementById('diasHorario').value = diasHorario;
+            document.getElementById('diaCritDoc').value = diaCritDoc;
             document.getElementById('idDoc').value = idDoc;
             document.getElementById('fechaRegistroCri').value = fechaRegistroCri;
             document.getElementById('codInclu').value = codInclu;
+            document.getElementById('hora').value = hora;
         }
     </script>
 </body>

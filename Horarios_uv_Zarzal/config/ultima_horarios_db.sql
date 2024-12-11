@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 27-11-2024 a las 16:51:25
+-- Tiempo de generación: 11-12-2024 a las 04:52:46
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `horarios`
 --
-CREATE DATABASE IF NOT EXISTS `horarios` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `horarios`;
 
 -- --------------------------------------------------------
 
@@ -29,13 +27,10 @@ USE `horarios`;
 -- Estructura de tabla para la tabla `asignatura`
 --
 
-DROP TABLE IF EXISTS `asignatura`;
 CREATE TABLE `asignatura` (
   `idAsig` int(11) NOT NULL COMMENT 'Número de Identificación de la Asignatura',
   `codAsig` varchar(11) DEFAULT NULL COMMENT 'Código de la Asignatura',
   `nombreAsig` varchar(30) DEFAULT NULL COMMENT 'Nombre de la Asignatura',
-  `codProg` int(11) NOT NULL COMMENT 'Código del Programa',
-  `periodoAcade` varchar(30) DEFAULT NULL COMMENT 'Periodo Académico',
   `codInclu` int(11) NOT NULL COMMENT 'Código de Inclusión(Discapacitados)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -43,14 +38,30 @@ CREATE TABLE `asignatura` (
 -- Volcado de datos para la tabla `asignatura`
 --
 
-INSERT INTO `asignatura` (`idAsig`, `codAsig`, `nombreAsig`, `codProg`, `periodoAcade`, `codInclu`) VALUES
-(1, '750022M', 'Sistemas de informacion', 2711, '6', 1),
-(2, '750057M', 'Practicas profesionales', 2711, '6', 1),
-(3, '730125M', 'impacto ambiental', 2712, '4', 1),
-(4, '204104M', 'Ingles II', 2712, '4', 1),
-(5, '204104M', 'Ingles II', 2716, '4', 1),
-(6, '730169M', 'Sistemas agricolas', 2716, '3', 1),
-(7, '701006C', 'Talle I', 2724, '1', 1);
+INSERT INTO `asignatura` (`idAsig`, `codAsig`, `nombreAsig`, `codInclu`) VALUES
+(1, '750022M', 'Sistemas de informacion', 1),
+(2, '750057M', 'Practicas profesionales', 1),
+(3, '730125M', 'impacto ambiental', 1),
+(4, '204104M', 'Ingles II', 1),
+(5, '204104M', 'Ingles II', 1),
+(6, '730169M', 'Sistemas agricolas', 1),
+(7, '701006C', 'Talle I', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `asignaturaperiodo`
+--
+
+CREATE TABLE `asignaturaperiodo` (
+  `idAsigPer` int(11) NOT NULL,
+  `idAsig` int(11) NOT NULL,
+  `codProg` int(11) NOT NULL,
+  `grupo` int(11) NOT NULL,
+  `numCupo` int(11) NOT NULL,
+  `idPerAca` int(11) NOT NULL COMMENT 'Identificación del periodo académico',
+  `semPro` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -58,21 +69,21 @@ INSERT INTO `asignatura` (`idAsig`, `codAsig`, `nombreAsig`, `codProg`, `periodo
 -- Estructura de tabla para la tabla `criteriodocente`
 --
 
-DROP TABLE IF EXISTS `criteriodocente`;
 CREATE TABLE `criteriodocente` (
   `idCritDoc` int(11) NOT NULL COMMENT 'Número de Identificación del criterio del Docente',
-  `diasHorario` varchar(30) DEFAULT NULL COMMENT 'Cantidad de Días permitidos en el Horario',
+  `diaCritDoc` varchar(30) DEFAULT NULL COMMENT 'Días disponibles de la semana para una asignatura',
   `idDoc` int(11) NOT NULL COMMENT 'Número de Identificación del Docente',
   `fechaRegistroCri` date DEFAULT NULL COMMENT 'Fecha del Registro de un nuevo Criterio',
-  `codInclu` int(11) NOT NULL COMMENT 'Código de Inclusión(Discapacitados)'
+  `codInclu` int(11) NOT NULL COMMENT 'Código de Inclusión(Discapacitados)',
+  `hora` int(11) NOT NULL COMMENT 'ORGANIZAR'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `criteriodocente`
 --
 
-INSERT INTO `criteriodocente` (`idCritDoc`, `diasHorario`, `idDoc`, `fechaRegistroCri`, `codInclu`) VALUES
-(43, '36', 1, '2024-10-07', 1);
+INSERT INTO `criteriodocente` (`idCritDoc`, `diaCritDoc`, `idDoc`, `fechaRegistroCri`, `codInclu`, `hora`) VALUES
+(43, '36', 1, '2024-10-07', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -80,7 +91,6 @@ INSERT INTO `criteriodocente` (`idCritDoc`, `diasHorario`, `idDoc`, `fechaRegist
 -- Estructura de tabla para la tabla `departamento`
 --
 
-DROP TABLE IF EXISTS `departamento`;
 CREATE TABLE `departamento` (
   `idDepto` int(11) NOT NULL COMMENT 'Número de Identificación del Departamento',
   `nombreDepto` varchar(30) DEFAULT NULL COMMENT 'Nombre del Departamento',
@@ -104,13 +114,13 @@ INSERT INTO `departamento` (`idDepto`, `nombreDepto`, `descriDepto`, `nomenDepto
 -- Estructura de tabla para la tabla `diaasignacion`
 --
 
-DROP TABLE IF EXISTS `diaasignacion`;
 CREATE TABLE `diaasignacion` (
   `idDiaAsig` int(11) NOT NULL,
   `idHorPer` int(11) NOT NULL,
   `diaAsig` varchar(30) NOT NULL,
   `horaInicio` varchar(30) NOT NULL,
-  `horaFin` varchar(30) NOT NULL
+  `horaFin` varchar(30) NOT NULL,
+  `idAsigPer` int(11) NOT NULL COMMENT 'Identificación de la asignatura del periodo académico'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -119,7 +129,6 @@ CREATE TABLE `diaasignacion` (
 -- Estructura de tabla para la tabla `docasighorario`
 --
 
-DROP TABLE IF EXISTS `docasighorario`;
 CREATE TABLE `docasighorario` (
   `idDocAsig` int(11) NOT NULL COMMENT 'Número de Identificación del Docente y Asignatura',
   `idDoc` int(11) NOT NULL COMMENT 'Número de Identificación del Docente',
@@ -143,12 +152,10 @@ INSERT INTO `docasighorario` (`idDocAsig`, `idDoc`, `idAsig`, `idEsp`, `diaAsigH
 -- Estructura de tabla para la tabla `docente`
 --
 
-DROP TABLE IF EXISTS `docente`;
 CREATE TABLE `docente` (
   `idDoc` int(11) NOT NULL COMMENT 'Número de Identificación del Docente',
   `cedulaDoc` varchar(11) DEFAULT NULL COMMENT 'Cédula del Docente',
   `nombreDoc` varchar(30) DEFAULT NULL COMMENT 'Nombre del Docente',
-  `localDoc` varchar(30) DEFAULT NULL COMMENT 'Localidad donde habita el Docente',
   `idTipoDoc` int(11) NOT NULL COMMENT 'Número de Identificación del Tipo de Docente',
   `idMuni` int(11) NOT NULL COMMENT 'Número de Identificación del Municipio'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -157,8 +164,8 @@ CREATE TABLE `docente` (
 -- Volcado de datos para la tabla `docente`
 --
 
-INSERT INTO `docente` (`idDoc`, `cedulaDoc`, `nombreDoc`, `localDoc`, `idTipoDoc`, `idMuni`) VALUES
-(1, '1111', 'Pepita', 'Valle del Cauca', 1, 1);
+INSERT INTO `docente` (`idDoc`, `cedulaDoc`, `nombreDoc`, `idTipoDoc`, `idMuni`) VALUES
+(1, '1111', 'Pepita', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -166,7 +173,6 @@ INSERT INTO `docente` (`idDoc`, `cedulaDoc`, `nombreDoc`, `localDoc`, `idTipoDoc
 -- Estructura de tabla para la tabla `espacio`
 --
 
-DROP TABLE IF EXISTS `espacio`;
 CREATE TABLE `espacio` (
   `idEsp` int(11) NOT NULL COMMENT 'Número de Identificación del Espacio',
   `idTipoEsp` int(11) NOT NULL COMMENT 'Número de Identificación del tipo de Espacio',
@@ -189,7 +195,6 @@ INSERT INTO `espacio` (`idEsp`, `idTipoEsp`, `codUbi`, `capacidad`, `piso`, `cum
 -- Estructura de tabla para la tabla `generacion`
 --
 
-DROP TABLE IF EXISTS `generacion`;
 CREATE TABLE `generacion` (
   `idGen` int(11) NOT NULL,
   `idDiaAsig` int(11) NOT NULL,
@@ -203,12 +208,10 @@ CREATE TABLE `generacion` (
 -- Estructura de tabla para la tabla `horarioperiodo`
 --
 
-DROP TABLE IF EXISTS `horarioperiodo`;
 CREATE TABLE `horarioperiodo` (
   `idHorPer` int(11) NOT NULL,
   `idDoc` int(11) NOT NULL,
   `idAsig` int(11) NOT NULL,
-  `codProg` int(11) NOT NULL,
   `periodoHP` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -218,7 +221,6 @@ CREATE TABLE `horarioperiodo` (
 -- Estructura de tabla para la tabla `inclusionsocial`
 --
 
-DROP TABLE IF EXISTS `inclusionsocial`;
 CREATE TABLE `inclusionsocial` (
   `codInclu` int(11) NOT NULL COMMENT 'código de la Inclusión Social',
   `nombreInclu` varchar(30) DEFAULT NULL COMMENT 'Nombre de la Inclusión Social',
@@ -239,7 +241,6 @@ INSERT INTO `inclusionsocial` (`codInclu`, `nombreInclu`, `descriInclu`, `nomenI
 -- Estructura de tabla para la tabla `municipio`
 --
 
-DROP TABLE IF EXISTS `municipio`;
 CREATE TABLE `municipio` (
   `idMuni` int(11) NOT NULL COMMENT 'Número de Identificación del Municipio',
   `nombreMuni` varchar(30) DEFAULT NULL COMMENT 'Nombre del Municipio',
@@ -266,7 +267,6 @@ INSERT INTO `municipio` (`idMuni`, `nombreMuni`, `descriMuni`, `nomenMuni`, `idD
 -- Estructura de tabla para la tabla `pais`
 --
 
-DROP TABLE IF EXISTS `pais`;
 CREATE TABLE `pais` (
   `idPais` int(11) NOT NULL COMMENT 'Número de Identificación del País',
   `nombrePais` varchar(30) DEFAULT NULL COMMENT 'Nombre del País',
@@ -286,10 +286,22 @@ INSERT INTO `pais` (`idPais`, `nombrePais`, `descriPais`, `nomenPais`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `periodoacademico`
+--
+
+CREATE TABLE `periodoacademico` (
+  `idPerAca` int(11) NOT NULL COMMENT 'Identificación del periodo académico',
+  `nombrePerAca` varchar(30) NOT NULL COMMENT 'Nombre del periodo académico',
+  `descripPerAca` varchar(100) NOT NULL COMMENT 'Descripción del periodo académico',
+  `nomenPerAca` varchar(11) NOT NULL COMMENT 'Nomenclatura del periodo académico'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `poblacionhorario`
 --
 
-DROP TABLE IF EXISTS `poblacionhorario`;
 CREATE TABLE `poblacionhorario` (
   `idPobHor` int(11) NOT NULL,
   `idGen` int(11) NOT NULL,
@@ -302,7 +314,6 @@ CREATE TABLE `poblacionhorario` (
 -- Estructura de tabla para la tabla `programa`
 --
 
-DROP TABLE IF EXISTS `programa`;
 CREATE TABLE `programa` (
   `codProg` int(11) NOT NULL COMMENT 'Código del Programa Académico',
   `nombreProg` varchar(30) DEFAULT NULL COMMENT 'Nombre del Programa Académico',
@@ -334,7 +345,6 @@ INSERT INTO `programa` (`codProg`, `nombreProg`, `descriProg`, `SNIES`, `jornada
 -- Estructura de tabla para la tabla `salon`
 --
 
-DROP TABLE IF EXISTS `salon`;
 CREATE TABLE `salon` (
   `codSalon` int(11) NOT NULL,
   `capSalon` varchar(15) NOT NULL,
@@ -348,7 +358,6 @@ CREATE TABLE `salon` (
 -- Estructura de tabla para la tabla `tipodocente`
 --
 
-DROP TABLE IF EXISTS `tipodocente`;
 CREATE TABLE `tipodocente` (
   `idTipoDoc` int(11) NOT NULL COMMENT 'Número de Identificación del Tipo de Docente',
   `nombreTipoDoc` varchar(30) DEFAULT NULL COMMENT 'Nombre del Tipo de Docente',
@@ -371,7 +380,6 @@ INSERT INTO `tipodocente` (`idTipoDoc`, `nombreTipoDoc`, `descTipoDoc`, `nomenTi
 -- Estructura de tabla para la tabla `tipoespacio`
 --
 
-DROP TABLE IF EXISTS `tipoespacio`;
 CREATE TABLE `tipoespacio` (
   `idTipoEsp` int(11) NOT NULL COMMENT 'Número de Identificación del Tipo de Espacio',
   `nombreTipoEsp` varchar(30) DEFAULT NULL COMMENT 'Nombre del Tipo de Espacio',
@@ -393,7 +401,6 @@ INSERT INTO `tipoespacio` (`idTipoEsp`, `nombreTipoEsp`, `descriTipoEsp`, `nomen
 -- Estructura de tabla para la tabla `ubicacion`
 --
 
-DROP TABLE IF EXISTS `ubicacion`;
 CREATE TABLE `ubicacion` (
   `codUbi` int(11) NOT NULL COMMENT 'Código de Ubicación',
   `nombreUbi` varchar(30) DEFAULT NULL COMMENT 'Nombre de la Ubicación',
@@ -414,20 +421,20 @@ INSERT INTO `ubicacion` (`codUbi`, `nombreUbi`, `descriUbi`, `nomenUbi`) VALUES
 -- Estructura de tabla para la tabla `usuario`
 --
 
-DROP TABLE IF EXISTS `usuario`;
 CREATE TABLE `usuario` (
   `id_cargo` int(5) NOT NULL,
   `usuario` varchar(30) NOT NULL,
-  `passwd` varchar(20) NOT NULL
+  `passwd` varchar(20) NOT NULL,
+  `tipoUsu` varchar(30) NOT NULL COMMENT 'Tipo de usuario que ingresa al sistema'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`id_cargo`, `usuario`, `passwd`) VALUES
-(1, 'prueba', '12345'),
-(2, 'jc', '12345');
+INSERT INTO `usuario` (`id_cargo`, `usuario`, `passwd`, `tipoUsu`) VALUES
+(1, 'prueba', '12345', ''),
+(2, 'jc', '12345', '');
 
 --
 -- Índices para tablas volcadas
@@ -438,8 +445,16 @@ INSERT INTO `usuario` (`id_cargo`, `usuario`, `passwd`) VALUES
 --
 ALTER TABLE `asignatura`
   ADD PRIMARY KEY (`idAsig`),
-  ADD KEY `codProg` (`codProg`),
   ADD KEY `codInclu` (`codInclu`);
+
+--
+-- Indices de la tabla `asignaturaperiodo`
+--
+ALTER TABLE `asignaturaperiodo`
+  ADD PRIMARY KEY (`idAsigPer`),
+  ADD KEY `idAsig` (`idAsig`),
+  ADD KEY `codProg` (`codProg`),
+  ADD KEY `idPerAcademico` (`idPerAca`);
 
 --
 -- Indices de la tabla `criteriodocente`
@@ -461,7 +476,8 @@ ALTER TABLE `departamento`
 --
 ALTER TABLE `diaasignacion`
   ADD PRIMARY KEY (`idDiaAsig`),
-  ADD KEY `idHorPer` (`idHorPer`);
+  ADD KEY `idHorPer` (`idHorPer`),
+  ADD KEY `idAsgPer` (`idAsigPer`);
 
 --
 -- Indices de la tabla `docasighorario`
@@ -502,8 +518,7 @@ ALTER TABLE `generacion`
 ALTER TABLE `horarioperiodo`
   ADD PRIMARY KEY (`idHorPer`),
   ADD KEY `idDoc` (`idDoc`),
-  ADD KEY `idAsig` (`idAsig`),
-  ADD KEY `codProg` (`codProg`);
+  ADD KEY `idAsig` (`idAsig`);
 
 --
 -- Indices de la tabla `inclusionsocial`
@@ -523,6 +538,12 @@ ALTER TABLE `municipio`
 --
 ALTER TABLE `pais`
   ADD PRIMARY KEY (`idPais`);
+
+--
+-- Indices de la tabla `periodoacademico`
+--
+ALTER TABLE `periodoacademico`
+  ADD PRIMARY KEY (`idPerAca`);
 
 --
 -- Indices de la tabla `poblacionhorario`
@@ -591,8 +612,15 @@ ALTER TABLE `usuario`
 -- Filtros para la tabla `asignatura`
 --
 ALTER TABLE `asignatura`
-  ADD CONSTRAINT `asignatura_ibfk_1` FOREIGN KEY (`codProg`) REFERENCES `programa` (`codProg`),
   ADD CONSTRAINT `asignatura_ibfk_2` FOREIGN KEY (`codInclu`) REFERENCES `inclusionsocial` (`codInclu`);
+
+--
+-- Filtros para la tabla `asignaturaperiodo`
+--
+ALTER TABLE `asignaturaperiodo`
+  ADD CONSTRAINT `asignaturaperiodo_ibfk_1` FOREIGN KEY (`idAsig`) REFERENCES `asignatura` (`idAsig`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `asignaturaperiodo_ibfk_2` FOREIGN KEY (`codProg`) REFERENCES `programa` (`codProg`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `asignaturaperiodo_ibfk_3` FOREIGN KEY (`idPerAca`) REFERENCES `periodoacademico` (`idPerAca`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `criteriodocente`
@@ -647,8 +675,7 @@ ALTER TABLE `generacion`
 --
 ALTER TABLE `horarioperiodo`
   ADD CONSTRAINT `horarioperiodo_ibfk_1` FOREIGN KEY (`idDoc`) REFERENCES `docente` (`idDoc`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `horarioperiodo_ibfk_2` FOREIGN KEY (`idAsig`) REFERENCES `asignatura` (`idAsig`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `horarioperiodo_ibfk_3` FOREIGN KEY (`codProg`) REFERENCES `programa` (`codProg`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `horarioperiodo_ibfk_2` FOREIGN KEY (`idAsig`) REFERENCES `asignatura` (`idAsig`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `municipio`

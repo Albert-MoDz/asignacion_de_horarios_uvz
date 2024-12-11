@@ -18,15 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $idAsig = $_POST['idAsig'];
     $codAsig = $_POST['codAsig'];
     $nombreAsig = $_POST['nombreAsig'];
-    $codProg = $_POST['codProg'];
-    $periodoAcade = $_POST['periodoAcade'];
     $codInclu = $_POST['codInclu'];
 
     if ($idAsig) {
         // Update existing asignatura
-        $sql = "UPDATE asignatura SET codAsig = ?, nombreAsig = ?, codProg = ?, periodoAcade = ?, codInclu = ? WHERE idAsig = ?";
+        $sql = "UPDATE asignatura SET codAsig = ?, nombreAsig = ?, codInclu = ? WHERE idAsig = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssissi", $codAsig, $nombreAsig, $codProg, $periodoAcade, $codInclu, $idAsig);
+        $stmt->bind_param("ssii", $codAsig, $nombreAsig, $codInclu, $idAsig);
         if ($stmt->execute()) {
             echo "<script>alert('Asignatura actualizada exitosamente.'); window.location.href = 'asignatura.php';</script>";
         } else {
@@ -35,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->close();
     } else {
         // Insert new asignatura
-        $sql = "INSERT INTO asignatura (codAsig, nombreAsig, codProg, periodoAcade, codInclu) VALUES ('$codAsig', '$nombreAsig', '$codProg', '$periodoAcade', '$codInclu')";
+        $sql = "INSERT INTO asignatura (codAsig, nombreAsig, codInclu) VALUES ('$codAsig', '$nombreAsig', '$codInclu')";
         $resultado = mysqli_query($conn, $sql);
         if ($resultado === TRUE) {
             header("location: asignatura.php");
@@ -62,7 +60,7 @@ if (isset($_GET['delete'])) {
 
 // Handle search
 $search = $_GET['search'] ?? '';
-$searchQuery = $search ? "WHERE codAsig LIKE '%$search%' OR nombreAsig LIKE '%$search%' OR codProg LIKE '%$search%' OR periodoAcade LIKE '%$search%' OR codInclu LIKE '%$search%'" : '';
+$searchQuery = $search ? "WHERE codAsig LIKE '%$search%' OR nombreAsig LIKE '%$search%' OR codInclu LIKE '%$search%'" : '';
 
 // Pagination settings
 $recordsPerPage = 10;
@@ -93,24 +91,7 @@ $result = $conn->query($sql);
             padding: 0;
             background-color: #f0f0f0;
         }
-        .navbar {
-            background-color: #DC143C;
-            overflow: hidden;
-        }
-        .navbar a {
-            float: left;
-            display: block;
-            color: #fff;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
-        }
-        .navbar a:hover {
-            background-color: #FF5A73;
-        }
-        .navbar .right {
-            float: right;
-        }
+        
         .content {
             padding: 20px;
             text-align: center;
@@ -190,15 +171,7 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="inicio.php">Home</a>
-        <a href="asignatura.php">Asignaturas</a>
-        <a href="programa.php">Programas</a>
-        <a href="espacio.php">Espacios</a>
-        <a href="tipoespacio.php">Tipos de Espacios</a>
-        <a href="ubicacion.php">Ubicaciones</a>
-        <a href="logout.php" class="right">cerrar sesion</a>
-    </div>
+<?php include 'menu.php'; ?>
     <div class="content">
         <h1>Asignaturas</h1>
         <div class="form-container">
@@ -206,8 +179,6 @@ $result = $conn->query($sql);
                 <input type="hidden" name="idAsig" id="idAsig">
                 <input type="text" name="codAsig" id="codAsig" placeholder="Código de la Asignatura" required>
                 <input type="text" name="nombreAsig" id="nombreAsig" placeholder="Nombre de la Asignatura" required>
-                <input type="number" name="codProg" id="codProg" placeholder="Código del Programa" required>
-                <input type="text" name="periodoAcade" id="periodoAcade" placeholder="Periodo Académico" required>
                 <input type="number" name="codInclu" id="codInclu" placeholder="Código de Inclusión" required>
                 <button type="submit">Guardar</button>
             </form>
@@ -224,8 +195,6 @@ $result = $conn->query($sql);
                     <th>ID</th>
                     <th>Código</th>
                     <th>Nombre</th>
-                    <th>Código del Programa</th>
-                    <th>Periodo Académico</th>
                     <th>Código de Inclusión</th>
                     <th>Acciones</th>
                 </tr>
@@ -236,11 +205,9 @@ $result = $conn->query($sql);
                     <td><?php echo $row['idAsig']; ?></td>
                     <td><?php echo $row['codAsig']; ?></td>
                     <td><?php echo $row['nombreAsig']; ?></td>
-                    <td><?php echo $row['codProg']; ?></td>
-                    <td><?php echo $row['periodoAcade']; ?></td>
                     <td><?php echo $row['codInclu']; ?></td>
                     <td class="actions">
-                        <a href="javascript:void(0);" onclick="editAsignatura(<?php echo $row['idAsig']; ?>, '<?php echo $row['codAsig']; ?>', '<?php echo $row['nombreAsig']; ?>', '<?php echo $row['codProg']; ?>', '<?php echo $row['periodoAcade']; ?>', '<?php echo $row['codInclu']; ?>')">Editar</a>
+                        <a href="javascript:void(0);" onclick="editAsignatura(<?php echo $row['idAsig']; ?>, '<?php echo $row['codAsig']; ?>', '<?php echo $row['nombreAsig']; ?>', '<?php echo $row['codInclu']; ?>')">Editar</a>
                         <a href="asignatura.php?delete=<?php echo $row['idAsig']; ?>" onclick="return confirm('¿Estás seguro de eliminar esta asignatura?')">Eliminar</a>
                     </td>
                 </tr>
@@ -264,8 +231,6 @@ $result = $conn->query($sql);
             document.getElementById('idAsig').value = idAsig || '';
             document.getElementById('codAsig').value = codAsig || '';
             document.getElementById('nombreAsig').value = nombreAsig || '';
-            document.getElementById('codProg').value = codProg || '';
-            document.getElementById('periodoAcade').value = periodoAcade || '';
             document.getElementById('codInclu').value = codInclu || '';
         }   
     </script>
