@@ -80,7 +80,7 @@ jobs:
       # Paso 7: Despliegue a DigitalOcean
       - name: Deploy to DigitalOcean
         run: |
-          ssh root@165.232.133.197 'git pull'
+          ssh root@165.232.133.197 'cd /home/Horarios_uv_Zarzal && git pull'
 
       # Paso 8: Notificar éxito (opcional)
       - name: Notify success
