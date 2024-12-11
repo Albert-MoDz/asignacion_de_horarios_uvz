@@ -1,7 +1,7 @@
 # Usa la imagen base de PHP con Apache
 FROM php:7.4-apache
 
-# Instalar dependencias necesarias para compilar extensiones PHP
+# Instalar dependencias necesarias para compilar extensiones de PHP
 RUN apt-get update && apt-get install -y \
     libicu-dev \
     libonig-dev \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     mbstring \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Configurar DocumentRoot en Apache (opcional)
+# Configurar el DocumentRoot en Apache (opcional)
 ENV APACHE_DOCUMENT_ROOT /var/www/html
 
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
@@ -23,7 +23,7 @@ RUN a2enmod rewrite
 # Copiar los archivos del proyecto al contenedor
 COPY . /var/www/html
 
-# Asigna permisos para que Apache pueda acceder a los archivos
+# Asignar permisos para que Apache pueda acceder a los archivos
 RUN chown -R www-data:www-data /var/www/html
 
 # Exponer el puerto 80
