@@ -35,7 +35,7 @@ jobs:
           repository: Albert-MoDz/asignacion_de_horarios_uvz
           ref: main
 
-      # Paso 2: Configurar Git para despliegue
+      # Paso 2: Configurar SSH para despliegue
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
@@ -58,28 +58,39 @@ jobs:
         run: |
           find . -type f -name "*.php" -exec php -l {} \;
 
-      # Paso 5: (Omitido) Ejecutar pruebas personalizadas
-
-      # Paso 6: Generar artefactos (opcional)
+      # Paso 5: Generar artefactos (opcional)
       - name: Generate build artifacts
         if: success()
         run: |
           mkdir -p artifacts
           zip -r artifacts/build.zip .
-        
-      # Paso 7: Subir artefactos (opcional)
+
+      # Paso 6: Subir artefactos (opcional)
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
           path: artifacts/build.zip
 
-      # Paso 8: Despliegue
-      - name: Deploy
+      # Paso 7: Instalar doctl (DigitalOcean CLI)
+      - name: Install doctl
+        run: |
+          curl -sL https://github.com/digitalocean/doctl/releases/download/v1.96.0/doctl-1.96.0-linux-amd64.tar.gz | tar -xz
+          sudo mv doctl /usr/local/bin/
+
+      # Paso 8: Autenticarse con DigitalOcean
+      - name: Authenticate with DigitalOcean
+        env:
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        run: |
+          doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
+
+      # Paso 9: Despliegue a DigitalOcean
+      - name: Deploy to DigitalOcean
         run: |
           ssh root@165.232.133.197 'cd /path/to/deployment && git pull && php setup.php'
 
-      # Paso 9: Notificar éxito (opcional)
+      # Paso 10: Notificar éxito (opcional)
       - name: Notify success
         if: success()
         run: echo "Deployment completed successfully!"
